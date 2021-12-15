@@ -15,6 +15,12 @@ PRIMEIRO_TURNO = (1, 'primeiro_turno_perc')
 SEGUNDO_TURNO = (2, 'segundo_turno_perc')
 TERCEIRO_TURNO = (3, 'terceiro_turno_perc')
 
+def definir_skip(file):
+    with open(file) as f:
+        if "General Cutfile" in f.readline(): sk_row = 1
+        else: sk_row = 0
+    return sk_row
+
 def subtrai_25_idle(line):
     if line.idle > 2.5:
         return line.idle - 2.5
@@ -122,7 +128,10 @@ def subtrai_interrupt(line):
             valor = 0
     return valor
 
-df = pd.read_fwf(filename, skiprows=1)
+df = pd.read_fwf(filename, skiprows=definir_skip(filename))
+
+df = df.dropna(subset=['Cutfile Name','Status']).reset_index(drop=True)
+df.rename(columns={'DryHaul':'dry_haul', 'Intrpt':'interrupt','Proc':'processing'}, inplace=True)
 
 if "___" in df.iloc[0]["Cutfile Name"]:
     df.drop(index=0, inplace=True)
@@ -137,6 +146,9 @@ substitui_virgulas(df)
 df = df[['start_time','end_time','total_time','cut','dry_haul','sharpen','bite','interrupt','processing','idle']]
 for col in ['cut','dry_haul','sharpen','bite','interrupt','processing','idle']:
     df[col] = pd.to_numeric(df[col])
+    
+df.to_excel(filename[:-4]+'.xlsx')
+
 df['primeiro_turno_perc'] = 0
 df['segundo_turno_perc'] = 0
 df['terceiro_turno_perc'] = 0
