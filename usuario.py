@@ -205,3 +205,18 @@ fig.suptitle(titulo, fontsize=25)
 fig.tight_layout()
 plt.savefig(filename[:-4]+'.png')
 
+gerencial = input("Gerencial? (s/n)")
+if gerencial == "s":
+    plt.clf()
+    fig, ax = plt.subplots(1, 1, figsize=(20,10))
+    ax.set_title("Relatório Gerencial - Todos os Turnos")
+    ax.pie(
+	df_prod["gerencial"], startangle=90, radius=1, colors=colors,
+	shadow=True, autopct="%1.1f%%", pctdistance=1.2, labeldistance=0, normalize=True
+	)
+    ax.legend(
+        labels=df_prod.index.tolist(), loc="upper center" ,fancybox=True, bbox_to_anchor=(0.5,0), shadow=True, ncol=2
+        )
+    plt.savefig(filename[:-4]+'_GERENCIAL.png')
+    
+
